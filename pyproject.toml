@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climagent"
+version = "0.1"
+description = "A brief description of your project"  # Add a brief description
+readme = "README.md"  # Link to your README file
+authors = [
+    { name = "Jacopo Grassi", email = "jacopo.grassi@polito.it" }
+]
+
+
+[project.scripts]
+climagent_archive = "scripts.climatology_archive:main"  
