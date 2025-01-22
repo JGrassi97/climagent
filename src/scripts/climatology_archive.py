@@ -24,25 +24,33 @@ def set_enviroment(path : str):
     return temp_dir, store_dir
 
 
-# Funzione globale che sarà eseguita nei processi paralleli
+# 
 def task(args):
-    var, stat, cd, period, temp_dir = args
-    retrieve_dataset('era5-x0.25', var, 'era5-x0.25', 'historical', 'timeseries', 'annual', stat, 
-                     'timeseries', 'mean', period, None, None, 
-                     ['lat_bnds', 'lon_bnds', 'bnds'], cd, temp_dir, f'{var}_{period}')
 
-def download_temp_data(variables, statistics, periods, convert_days, temp_dir, processes):
+    collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period, lat, lon, forbidden_list, convert_days, directory  = args
+
+    retrieve_dataset(collection, variable, dataset, scenario, product, aggregation, statistic, 
+                     type, percentile, period, lat, lon, 
+                     forbidden_list, convert_days, directory, f'{variable}_{period}_{scenario}_{percentile}')
+    
+
+
+def download_temp_data(collection, variables, dataset, scenarios, product, aggregation, statistics, type, percentiles, periods, lat, lon, forbidden_list, convert_days, directory, processes):
     """
     Download the files from the s3 bucket using multiprocessing.
     """
 
-    tasks = [(var, stat, cd, period, temp_dir) for var, stat, cd in zip(variables, statistics, convert_days) for period in periods]
+    tasks = [(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period, lat, lon, forbidden_list, convert_day, directory) 
+             for variable, statistic, convert_day in zip(variables, statistics, convert_days) 
+             for percentile in percentiles
+             for scenario in scenarios
+             for period in periods]
 
     with multiprocessing.Pool(processes=processes) as pool:
         pool.map(task, tasks) 
             
 
-def create_zarr_archive(variables, periods, temp_dir, store_dir):
+def create_zarr_archive(variables, periods, percentiles, scenarios, product, temp_dir, store_dir):
     """
     Create a zarr archive from the downloaded files.
     """
@@ -50,16 +58,30 @@ def create_zarr_archive(variables, periods, temp_dir, store_dir):
     dats = []
     for var in variables:
         for period in periods:
+            for percentile in percentiles:
+                for scenario in scenarios:
 
-            try:
-                dats.append(xr.open_dataset(f'{temp_dir}/{var}_{period}.nc'))
-            except:
-                pass
+                    try:
+                        single_dat = xr.open_dataset(f'{temp_dir}/{var}_{period}_{scenario}_{percentile}.nc')
 
+                        # Add dimension for scenario
+                        single_dat = single_dat.expand_dims('scenario')
+                        single_dat['scenario'] = [scenario]
+
+                        # Add dimension for band
+                        single_dat = single_dat.expand_dims('percentile')
+                        single_dat['percentile'] = [percentile]
+                        
+                        dats.append(single_dat)
+
+                    except:
+                        raise
+                        pass
 
     dats = xr.merge(dats)
+    dats.to_zarr(f'{store_dir}/{product}_timeseries.zarr', mode='w')
 
-    dats.to_zarr(f'{store_dir}/era5-x0.25_timeseries.zarr', mode='w')
+
 
 
 
@@ -80,18 +102,50 @@ def main():
     )
 
     processes = parser.parse_args().processes
+    
+    path = 'example'
+    temp_dir, store_dir = set_enviroment(path)
+    lat = None
+    lon = None
+    forbidden_list = ['lat_bnds', 'lon_bnds', 'bnds']
 
-    path = '/example'
 
     variables = ['tas', 'tasmin', 'tasmax', 'pr', 'cdd', 'cdd65', 'fd', 'hd30', 'hd35', 'hd40' , 'hd42', 'hd45', 'csdi','hdd65', 'hi', 'hi35', 'hi37', 'hi39', 'hi41', 'r20mm', 'r50mm', 'rx1day', 'rx5day','sd','td','tnn','tr','tr23','tr26','tr29','tr32','txx','wsdi']
     statistics = ['mean', 'mean', 'mean', 'mean', 'max', 'mean', 'mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean']
     convert_days = [False, False, False, False, True, False, True, True, True, True, True, True, True, False, False, True, True, True, True, True, True, True, True, True, True, False, True, True, True, True,True, True, False, True]
 
-    periods = ['1950-2023']
 
+    
+
+    # ERA5 ARCHIVE
+    collection = 'era5-x0.25'
+    periods = ['1991-2020']
+    dataset = 'era5-x0.25'
+    scenarios = ['historical']
+    product = 'climatology'
+    aggregation = 'annual'
+    type = 'climatology'
+    percentiles = ['mean']
+    print('ERA5')
+    download_temp_data(collection, variables, dataset, scenarios, product, aggregation, statistics, type, percentiles, periods, lat, lon, forbidden_list, convert_days, temp_dir, processes)
+    create_zarr_archive(variables, periods, percentiles, scenarios, 'ERA5', temp_dir, store_dir)
+
+    shutil.rmtree(temp_dir)
+
+    # CMIP6 ARCHIVE
     temp_dir, store_dir = set_enviroment(path)
-    download_temp_data(variables, statistics, periods, convert_days, temp_dir, processes)
-    create_zarr_archive(variables, periods, temp_dir, store_dir)
+
+    collection = 'cmip6-x0.25'
+    periods = ['2015-2100']
+    dataset = 'ensemble-all'
+    scenarios = ['ssp126']
+    product = 'timeseries'
+    aggregation = 'annual'
+    type = 'timeseries'
+    percentiles = ['p10']
+
+    download_temp_data(collection, variables, dataset, scenarios, product, aggregation, statistics, type, percentiles, periods, lat, lon, forbidden_list, convert_days, temp_dir, processes)
+    create_zarr_archive(variables, periods, percentiles, scenarios, 'CMIP6', temp_dir, store_dir)    
 
     shutil.rmtree(temp_dir)
     

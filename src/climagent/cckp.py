@@ -45,6 +45,7 @@ def _download_file(collection : str, variable : str, dataset : str, scenario : s
         return 0
     
     except:
+        raise
         return 1
 
 
@@ -121,7 +122,7 @@ def retrieve_dataset(collection, variable, dataset, scenario, product, aggregati
 
     file_name = f'{directory}/{os.path.basename(_get_url(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period))}'
     
-    with xr.open_dataset(file_name, engine='h5netcdf') as dataset:
+    with xr.open_dataset(file_name) as dataset:
 
         dataset = _subset_dataset(dataset, lat, lon)
         dataset = _clean_dataset(dataset, forbidden_list)
@@ -129,6 +130,8 @@ def retrieve_dataset(collection, variable, dataset, scenario, product, aggregati
 
         if cd:
             dataset = _convert_days(dataset)
+
+        dataset['time'] = pd.to_datetime(dataset.time.values)
 
         _save_dataset(dataset, directory, name)
 
