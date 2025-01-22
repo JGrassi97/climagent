@@ -24,19 +24,6 @@ def set_enviroment(path : str):
     return temp_dir, store_dir
 
 
-# def download_temp_data(variables, statistics, periods, convert_days, temp_dir):
-#     """
-#     Download the files from the s3 bucket.
-#     """
-
-#     for var, stat, cd in zip(variables, statistics, convert_days):
-#         for period in periods:
-
-#             retrieve_dataset('era5-x0.25', var, 'era5-x0.25', 'historical', 'climatology', 'annual', stat, 'climatology', 'mean', period,
-#                         [40, 50], [0,20], ['lat_bnds', 'lon_bnds', 'bnds'], cd, temp_dir, f'{var}_{period}')
-
-
-
 # Funzione globale che sarà eseguita nei processi paralleli
 def task(args):
     var, stat, cd, period, temp_dir = args
@@ -44,14 +31,14 @@ def task(args):
                      'timeseries', 'mean', period, None, None, 
                      ['lat_bnds', 'lon_bnds', 'bnds'], cd, temp_dir, f'{var}_{period}')
 
-def download_temp_data(variables, statistics, periods, convert_days, temp_dir):
+def download_temp_data(variables, statistics, periods, convert_days, temp_dir, processes):
     """
     Download the files from the s3 bucket using multiprocessing.
     """
 
     tasks = [(var, stat, cd, period, temp_dir) for var, stat, cd in zip(variables, statistics, convert_days) for period in periods]
 
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+    with multiprocessing.Pool(processes=processes) as pool:
         pool.map(task, tasks) 
             
 
@@ -80,7 +67,21 @@ def main():
 
     warnings.filterwarnings("ignore")
 
-    path = '/Users/jacopograssi/Documents/climagent/example'
+
+    parser = argparse.ArgumentParser()
+
+
+    parser.add_argument(
+        "--processes",
+        help="Number of processes for parallel download",
+        type=int,
+        default=4,
+        required=False
+    )
+
+    processes = parser.parse_args().processes
+
+    path = '/home/jgrassi/work/climagent/example'
 
     variables = ['tas', 'tasmin', 'tasmax', 'pr', 'cdd', 'cdd65', 'fd', 'hd30', 'hd35', 'hd40' , 'hd42', 'hd45', 'csdi','hdd65', 'hi', 'hi35', 'hi37', 'hi39', 'hi41', 'r20mm', 'r50mm', 'rx1day', 'rx5day','sd','td','tnn','tr','tr23','tr26','tr29','tr32','txx','wsdi']
     statistics = ['mean', 'mean', 'mean', 'mean', 'max', 'mean', 'mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean']
@@ -89,7 +90,7 @@ def main():
     periods = ['1950-2023']
 
     temp_dir, store_dir = set_enviroment(path)
-    download_temp_data(variables, statistics, periods, convert_days, temp_dir)
+    download_temp_data(variables, statistics, periods, convert_days, temp_dir, processes)
     create_zarr_archive(variables, periods, temp_dir, store_dir)
 
     shutil.rmtree(temp_dir)
