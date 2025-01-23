@@ -45,7 +45,6 @@ def _download_file(collection : str, variable : str, dataset : str, scenario : s
         return 0
     
     except:
-        raise
         return 1
 
 

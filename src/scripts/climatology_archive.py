@@ -6,6 +6,7 @@ import pandas as pd
 import argparse
 import warnings
 import multiprocessing
+import zarr
 
 from climagent.cckp import _download_file, retrieve_dataset
 
@@ -68,17 +69,17 @@ def create_zarr_archive(variables, periods, percentiles, scenarios, product, tem
                         single_dat = single_dat.expand_dims('scenario')
                         single_dat['scenario'] = [scenario]
 
-                        # Add dimension for band
+                        # Add dimension for percentile
                         single_dat = single_dat.expand_dims('percentile')
                         single_dat['percentile'] = [percentile]
                         
                         dats.append(single_dat)
 
                     except:
-                        raise
                         pass
 
     dats = xr.merge(dats)
+    dats = dats.chunk({'time': -1, 'percentile': -1, 'scenario': -1, 'lat': 181, 'lon': 720})
     dats.to_zarr(f'{store_dir}/{product}_timeseries.zarr', mode='w')
 
 
@@ -88,10 +89,7 @@ def create_zarr_archive(variables, periods, percentiles, scenarios, product, tem
 def main():
 
     warnings.filterwarnings("ignore")
-
-
     parser = argparse.ArgumentParser()
-
 
     parser.add_argument(
         "--processes",
@@ -105,26 +103,27 @@ def main():
     
     path = 'example'
     temp_dir, store_dir = set_enviroment(path)
-    lat = None
-    lon = None
+    lat = [30,60]
+    lon = [0,30]
     forbidden_list = ['lat_bnds', 'lon_bnds', 'bnds']
-
 
     variables = ['tas', 'tasmin', 'tasmax', 'pr', 'cdd', 'cdd65', 'fd', 'hd30', 'hd35', 'hd40' , 'hd42', 'hd45', 'csdi','hdd65', 'hi', 'hi35', 'hi37', 'hi39', 'hi41', 'r20mm', 'r50mm', 'rx1day', 'rx5day','sd','td','tnn','tr','tr23','tr26','tr29','tr32','txx','wsdi']
     statistics = ['mean', 'mean', 'mean', 'mean', 'max', 'mean', 'mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean','mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean', 'mean']
     convert_days = [False, False, False, False, True, False, True, True, True, True, True, True, True, False, False, True, True, True, True, True, True, True, True, True, True, False, True, True, True, True,True, True, False, True]
 
 
+
     
 
     # ERA5 ARCHIVE
     collection = 'era5-x0.25'
-    periods = ['1991-2020']
+    periods = ['1950-2023']
+    #periods = ['1986-2005','1991-2020']
     dataset = 'era5-x0.25'
     scenarios = ['historical']
-    product = 'climatology'
+    product = 'timeseries'
     aggregation = 'annual'
-    type = 'climatology'
+    type = 'timeseries'
     percentiles = ['mean']
     print('ERA5')
     download_temp_data(collection, variables, dataset, scenarios, product, aggregation, statistics, type, percentiles, periods, lat, lon, forbidden_list, convert_days, temp_dir, processes)
@@ -137,12 +136,13 @@ def main():
 
     collection = 'cmip6-x0.25'
     periods = ['2015-2100']
+    #periods = ['2020-2039','2040-2059','2060-2079','2080-2099']
     dataset = 'ensemble-all'
-    scenarios = ['ssp126']
+    scenarios = ['ssp126', 'ssp245','ssp585']
     product = 'timeseries'
     aggregation = 'annual'
     type = 'timeseries'
-    percentiles = ['p10']
+    percentiles = ['p10', 'median', 'p90']
 
     download_temp_data(collection, variables, dataset, scenarios, product, aggregation, statistics, type, percentiles, periods, lat, lon, forbidden_list, convert_days, temp_dir, processes)
     create_zarr_archive(variables, periods, percentiles, scenarios, 'CMIP6', temp_dir, store_dir)    
