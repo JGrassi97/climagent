@@ -130,7 +130,7 @@ def retrieve_dataset(collection, variable, dataset, scenario, product, aggregati
         if cd:
             dataset = _convert_days(dataset)
 
-        dataset['time'] = pd.to_datetime(dataset.time.values)
+        dataset['time'] = pd.to_datetime(dataset.time.values.astype(str)).year
 
         _save_dataset(dataset, directory, name)
 
