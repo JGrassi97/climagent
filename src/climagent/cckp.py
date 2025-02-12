@@ -25,6 +25,7 @@ def _download_file(collection : str, variable : str, dataset : str, scenario : s
     url = _get_url(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period)
     local_filename = os.path.join(dest_folder, os.path.basename(url))
 
+
     try:
 
         with requests.get(url, stream=True) as r:
@@ -53,7 +54,15 @@ def _subset_dataset(dataset : xr.Dataset, lat : list, lon : list) -> xr.Dataset:
     Subset the dataset to a specific lat and lon.
     """
     if lat is not None and lon is not None:
-        dataset = dataset.sel(lat=slice(lat[0], lat[1]), lon=slice(lon[0], lon[1]))
+
+        if lon[0] >= 0:
+            dataset = dataset.sel(lat=slice(lat[0], lat[1]), lon=slice(lon[0], lon[1]))
+        
+        else:
+            dataset_0 = dataset.sel(lat=slice(lat[0], lat[1]), lon=slice(lon[0], 0))
+            dataset_1 = dataset.sel(lat=slice(lat[0], lat[1]), lon=slice(0, lon[1]))
+            dataset = xr.concat([dataset_0, dataset_1], dim='lon')
+
 
     return dataset
 
@@ -96,7 +105,7 @@ def _save_dataset(dataset: xr.Dataset, directory : str, name : str) -> None:
 
 def _convert_timedelta_to_days(timedelta_str):
     
-    return float(pd.Timedelta(timedelta_str).total_seconds() / 86400)
+    return np.float32(pd.Timedelta(timedelta_str).total_seconds() / 86400)
 
 
 def _convert_days(dataset : xr.Dataset) -> xr.Dataset:
@@ -114,24 +123,36 @@ def retrieve_dataset(collection, variable, dataset, scenario, product, aggregati
     Retrieve the dataset from the s3 bucket, subset it and save it to csv.
     """
 
-    stat = _download_file(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period, directory)
+    file_name = f'{directory}/{variable}_{period}_{scenario}_{percentile}.nc'
 
-    if stat == 1:
-        return 1
+    if not os.path.exists(file_name):
+        
+        stat = _download_file(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period, directory)
 
-    file_name = f'{directory}/{os.path.basename(_get_url(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period))}'
-    
-    with xr.open_dataset(file_name) as dataset:
+        if stat == 1:
+            return 1
 
-        dataset = _subset_dataset(dataset, lat, lon)
-        dataset = _clean_dataset(dataset, forbidden_list)
-        dataset = _rename_variable(dataset, variable)
+        file_name = f'{directory}/{os.path.basename(_get_url(collection, variable, dataset, scenario, product, aggregation, statistic, type, percentile, period))}'
+        
+        with xr.open_dataset(file_name) as dataset:
 
-        if cd:
-            dataset = _convert_days(dataset)
+            dataset = _subset_dataset(dataset, lat, lon)
+            dataset = _clean_dataset(dataset, forbidden_list)
+            dataset = _rename_variable(dataset, variable)
 
-        dataset['time'] = pd.to_datetime(dataset.time.values.astype(str)).year
+            if cd:
+                dataset = _convert_days(dataset)
 
-        _save_dataset(dataset, directory, name)
+            dataset['time'] = pd.to_datetime(dataset.time.values.astype(str)).year
 
-    os.remove(file_name)
+            # Add dimension for scenario
+            dataset = dataset.expand_dims('scenario')
+            dataset['scenario'] = [scenario]
+
+            # Add dimension for percentile
+            dataset = dataset.expand_dims('percentile')
+            dataset['percentile'] = [percentile]
+
+            _save_dataset(dataset, directory, name)
+
+        os.remove(file_name)
