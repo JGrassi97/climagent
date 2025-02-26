@@ -8,7 +8,7 @@ import warnings
 import multiprocessing
 import zarr
 
-from climagent.cckp import _download_file, retrieve_dataset
+from climagent.data.cckp import _download_file, retrieve_dataset
 
 
 def set_enviroment(path : str):
