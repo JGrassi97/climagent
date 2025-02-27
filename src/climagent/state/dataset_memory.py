@@ -1,8 +1,6 @@
 # Author: jacopo.grassi@polito.it
 # Institute: Politecnico di Torino
 
-
-
 class DatasetMemory:
 
     def __init__(self, dataset):

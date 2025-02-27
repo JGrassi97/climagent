@@ -1,3 +1,6 @@
+# Author: jacopo.grassi@polito.it
+# Institute: Politecnico di Torino
+
 import pytest
 import numpy as np
 import xarray as xr
@@ -30,19 +33,3 @@ def test_create_json_spec(sample_dataset):
     assert 'attrs' in json_spec.dict_
     assert 'coords' in json_spec.dict_
     assert 'data_vars' in json_spec.dict_
-
-
-
-# def test_update_json_spec(sample_dataset):
-#     json_spec = _create_json_spec(sample_dataset)
-#     sample_dataset['new_variable'] = ('x', [1, 2, 3])
-#     updated_json_spec = update_json_spec(sample_dataset, json_spec)
-#     assert 'new_variable' in updated_json_spec.dict_['data_vars']
-
-# def test_json_get_value_tool(sample_dataset):
-#     json_spec = _create_json_spec(sample_dataset)
-#     tool = JsonGetValueTool(spec=json_spec)
-#     result = tool.run({'key_path': 'attrs.units'})
-#     assert result == 'metric'
-
-#aggiungi altri test per i tool di modifica.
