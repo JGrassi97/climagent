@@ -1,6 +1,11 @@
 # Author: jacopo.grassi@polito.it
 # Institute: Politecnico di Torino
 
+from climagent.state.json_memory import JsonMemory
+from langchain.tools import BaseTool
+from typing import Optional
+#from langchain.tools import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
+
 from langchain_community.tools.json.tool import (
     JsonGetValueTool,   # subclass of BaseTool
     JsonListKeysTool,   # subclass of BaseTool
@@ -14,36 +19,71 @@ _logger = logging.getLogger(__name__)
 
 
 
-def _get_dataset_attrs(dataset : xr.Dataset) -> dict :
-    """Returns dataset attributes."""
-    _logger.info("Getting dataset attributes")
-    return dataset.attrs
 
-def _get_dataset_coords(dataset : xr.Dataset) -> dict : 
-    """Returns dataset coordinates."""
-    _logger.info("Getting dataset coordinates")
-    all_coords = list(dataset.coords.keys())
-    coord_info = {coord: dataset.coords[coord].to_dict() for coord in all_coords}
-    return coord_info
+class JsonGetValueTool_custom(BaseTool):
+    """Tool for getting a value in a JSON spec."""
 
-def _get_dataset_vars(dataset : xr.Dataset) -> dict :
-    """Returns dataset variables."""
-    _logger.info("Getting dataset variables")
-    all_vars = list(dataset.data_vars.keys())
-    var_info = {var: dataset[var].attrs for var in all_vars}
-    return var_info
+    name: str = "json_spec_get_value"
+    description: str = """
+    Can be used to see value in string format at a given path.
+    Before calling this you should be SURE that the path to this exists.
+    The input is a text representation of the path to the dict in Python syntax (e.g. data["key1"][0]["key2"]).
+    """
+    json_memory: JsonMemory 
 
-def _create_json_spec(dataset : xr.Dataset, max_value_lenght : int = 1000) -> JsonSpec :
-    """Creates JsonSpec from dataset."""
-    data = {
-        'attrs': _get_dataset_attrs(dataset), 
-        'coords': _get_dataset_coords(dataset), 
-        'data_vars': _get_dataset_vars(dataset)
-        }
+    def __init__(self, json_memory: JsonMemory, **kwargs):
+        kwargs["json_memory"] = json_memory
+        super().__init__(**kwargs)
 
-    json_spec = JsonSpec(
-        dict_=data,
-        max_value_length=max_value_lenght
-    )
+    def _run(
+        self,
+        tool_input: str,
+        #run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        return self.json_memory.get_spec().value(tool_input)
 
-    return json_spec
+    async def _arun(
+        self,
+        tool_input: str,
+        #run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        return self._run(tool_input)
+    
+
+
+
+class JsonListKeysTool_custom(BaseTool):
+    """Tool for listing keys in a dynamically updated JSON spec."""
+
+    name: str = "json_spec_list_keys"
+    description: str = """
+    Can be used to list all keys at a given path in the JSON structure.
+    The input should be a text representation of the path in Python syntax 
+    (e.g., data["key1"][0]["key2"]). Make sure the path exists before calling.
+    """
+    json_memory: JsonMemory  # Use JsonMemory instead of a static JsonSpec
+
+    def __init__(self, json_memory: JsonMemory, **kwargs):
+        kwargs["json_memory"] = json_memory
+        super().__init__(**kwargs)
+
+    def _run(
+        self,
+        tool_input: str,
+        #run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Returns the list of keys at the specified JSON path."""
+        try:
+            json_spec = self.json_memory.get_spec()  # Get the latest json_spec
+            return str(json_spec.keys(tool_input))  # Convert list to string
+        except KeyError:
+            return f"Error: Invalid path '{tool_input}', key not found."
+        except Exception as e:
+            return f"Error: {e}"
+
+    async def _arun(
+        self,
+        tool_input: str,
+        #run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        return self._run(tool_input)
