@@ -5,9 +5,7 @@ import os
 import xarray as xr
 from langgraph.graph import StateGraph, END
 
-from typing_extensions import TypedDict
-from typing import Annotated
-import operator
+
 from langchain_core.messages import AnyMessage, ToolMessage
 
 
@@ -17,12 +15,12 @@ from climagent.tools.xarray_tools_indexing import SubsetDatasetTool
 from climagent.tools.xarray_tools_grouping import ResampleTimeTool
 from climagent.tools.xarray_tools_aggregating import AggregateDatasetTool
 from climagent.agent.prefix import PREFIX
+from climagent.agent.suffix import make_suffix
 
 from climagent.state.dataset_state import DatasetState
 from climagent.state.json_state import JsonState
+from climagent.state.agent_state import State
 
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], operator.add]
 
 
 class ClimAgent:
@@ -88,4 +86,4 @@ class ClimAgent:
         return graph_builder.compile()
     
     def run(self, messages: list[AnyMessage]):
-        return self.graph.invoke({'messages': [PREFIX] + messages},  config={"recursion_limit": 50}), self.dataset_state.dataset
+        return self.graph.invoke({'messages': [PREFIX] + messages + [make_suffix(self.json_memory)]},  config={"recursion_limit": 50}), self.dataset_state.dataset
