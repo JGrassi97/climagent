@@ -5,8 +5,8 @@ from langchain.tools import BaseTool
 import xarray as xr
 from typing import List, Type, Literal
 from pydantic import BaseModel, Field
-from climagent.state.dataset_memory import DatasetMemory
-from climagent.state.json_memory import JsonMemory
+from climagent.state.dataset_state import DatasetState
+from climagent.state.json_state import JsonState
 import numpy as np
 
 
@@ -21,8 +21,8 @@ class AggregateDatasetTool(BaseTool):
     name: str = "aggregate_dataset"
     description: str = "Aggregate the dataset on one or more coordinates."
     args_schema: Type[AggregateDatasetInput] = AggregateDatasetInput
-    dataset_memory: DatasetMemory
-    json_memory: JsonMemory  
+    dataset_state: DatasetState
+    json_memory: JsonState  
 
     XARRAY_FUNCTIONS : dict = {
         "mean": "mean",
@@ -37,14 +37,14 @@ class AggregateDatasetTool(BaseTool):
         "cumprod": "cumprod",
     }
 
-    def __init__(self, dataset_memory: DatasetMemory, json_memory: JsonMemory, **kwargs):
-        kwargs["dataset_memory"] = dataset_memory 
+    def __init__(self, dataset_state: DatasetState, json_memory: JsonState, **kwargs):
+        kwargs["dataset_state"] = dataset_state 
         kwargs["json_memory"] = json_memory
         super().__init__(**kwargs)
 
     def _run(self, func: str, dims: List[str]) -> str:
 
-        reduced_dat = self.dataset_memory.dataset.copy()
+        reduced_dat = self.dataset_state.dataset.copy()
 
         if func not in self.XARRAY_FUNCTIONS:
             return f"Error: Unsupported function '{func}'. Choose from {list(self.XARRAY_FUNCTIONS.keys())}"
@@ -53,7 +53,7 @@ class AggregateDatasetTool(BaseTool):
             reduced_dat = getattr(reduced_dat, self.XARRAY_FUNCTIONS[func])(dim=dims)
             operation = f"Aggregated on {dims} using {func}"
 
-            self.dataset_memory.update_dataset(reduced_dat, operation)
+            self.dataset_state.update_dataset(reduced_dat, operation)
             self.json_memory.update_json_spec(reduced_dat, operation)
 
             return f"Aggregation executed successfully: {operation}"

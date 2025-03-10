@@ -5,8 +5,8 @@ from langchain.tools import BaseTool
 import xarray as xr
 from typing import List, Type
 from pydantic import BaseModel, Field
-from climagent.state.dataset_memory import DatasetMemory
-from climagent.state.json_memory import JsonMemory
+from climagent.state.dataset_state import DatasetState
+from climagent.state.json_state import JsonState
 # JSON functions developed by langchain_community
 
 
@@ -18,17 +18,17 @@ class SubsetDatasetTool(BaseTool):
     name: str = "subset_dataset"
     description: str = "Subset an xarray dataset based on the provided coordinate name and values. Use one value for nearest selection or two values for a slice. Be sure to provide values consistent with the coordinate type (numeric, datetime, etc.)."
     args_schema: Type[SubsetDatasetInput] = SubsetDatasetInput
-    dataset_memory: DatasetMemory
-    json_memory: JsonMemory  
+    dataset_state: DatasetState
+    json_memory: JsonState  
 
-    def __init__(self, dataset_memory: DatasetMemory, json_memory: JsonMemory, **kwargs):
-        kwargs["dataset_memory"] = dataset_memory 
+    def __init__(self, dataset_state: DatasetState, json_memory: JsonState, **kwargs):
+        kwargs["dataset_state"] = dataset_state 
         kwargs["json_memory"] = json_memory
         super().__init__(**kwargs)
 
     def _run(self, coordinate_name: str, values: List[str]) -> str:
 
-        subset_dat = self.dataset_memory.dataset.copy()
+        subset_dat = self.dataset_state.dataset.copy()
 
         try:
             try:
@@ -54,7 +54,7 @@ class SubsetDatasetTool(BaseTool):
             else:
                 return "Error: Invalid number of values provided for subsetting. Provide one or two numeric values."
 
-            self.dataset_memory.update_dataset(subset_dat, operation)
+            self.dataset_state.update_dataset(subset_dat, operation)
             self.json_memory.update_json_spec(subset_dat, operation)
             return f"Subset executed successfully: {operation}"
 

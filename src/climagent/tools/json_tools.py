@@ -1,7 +1,7 @@
 # Author: jacopo.grassi@polito.it
 # Institute: Politecnico di Torino
 
-from climagent.state.json_memory import JsonMemory
+from climagent.state.json_state import JsonState
 from langchain.tools import BaseTool
 from typing import Optional
 #from langchain.tools import CallbackManagerForToolRun, AsyncCallbackManagerForToolRun
@@ -29,9 +29,9 @@ class JsonGetValueTool_custom(BaseTool):
     Before calling this you should be SURE that the path to this exists.
     The input is a text representation of the path to the dict in Python syntax (e.g. data["key1"][0]["key2"]).
     """
-    json_memory: JsonMemory 
+    json_memory: JsonState 
 
-    def __init__(self, json_memory: JsonMemory, **kwargs):
+    def __init__(self, json_memory: JsonState, **kwargs):
         kwargs["json_memory"] = json_memory
         super().__init__(**kwargs)
 
@@ -61,9 +61,9 @@ class JsonListKeysTool_custom(BaseTool):
     The input should be a text representation of the path in Python syntax 
     (e.g., data["key1"][0]["key2"]). Make sure the path exists before calling.
     """
-    json_memory: JsonMemory  # Use JsonMemory instead of a static JsonSpec
+    json_memory: JsonState  # Use JsonState instead of a static JsonSpec
 
-    def __init__(self, json_memory: JsonMemory, **kwargs):
+    def __init__(self, json_memory: JsonState, **kwargs):
         kwargs["json_memory"] = json_memory
         super().__init__(**kwargs)
 

@@ -6,7 +6,7 @@ from langchain_community.tools.json.tool import JsonSpec
 
 
 
-class JsonMemory:
+class JsonState:
     def __init__(self, dataset : xr.Dataset):
         self.json_spec_original = self._create_json_spec(dataset)
         self.json_spec = self._create_json_spec(dataset)
