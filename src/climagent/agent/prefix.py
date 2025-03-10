@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage
 
 PREFIX = SystemMessage(
     content=(
-            "You are an agent designed to interact with NetCDF-type datasets. "
+    "You are an agent designed to interact with NetCDF-type datasets. "
     "These datasets are accompanied by a JSON blob that serves as a structured description of the dataset, "
     "providing metadata, coordinate details, and variable information. However, this JSON does not contain actual data—"
     "it only describes the dataset as represented in the xarray library.\n\n"
