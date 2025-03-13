@@ -19,11 +19,11 @@ class SubsetDatasetTool(BaseTool):
     description: str = "Subset an xarray dataset based on the provided coordinate name and values. Use one value for nearest selection or two values for a slice. Be sure to provide values consistent with the coordinate type (numeric, datetime, etc.)."
     args_schema: Type[SubsetDatasetInput] = SubsetDatasetInput
     dataset_state: DatasetState
-    json_memory: JsonState  
+    json_state: JsonState  
 
-    def __init__(self, dataset_state: DatasetState, json_memory: JsonState, **kwargs):
+    def __init__(self, dataset_state: DatasetState, json_state: JsonState, **kwargs):
         kwargs["dataset_state"] = dataset_state 
-        kwargs["json_memory"] = json_memory
+        kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
     def _run(self, coordinate_name: str, values: List[str]) -> str:
@@ -55,7 +55,7 @@ class SubsetDatasetTool(BaseTool):
                 return "Error: Invalid number of values provided for subsetting. Provide one or two numeric values."
 
             self.dataset_state.update_dataset(subset_dat, operation)
-            self.json_memory.update_json_spec(subset_dat, operation)
+            self.json_state.update_json_spec(subset_dat, operation)
             return f"Subset executed successfully: {operation}"
 
         except Exception as e:

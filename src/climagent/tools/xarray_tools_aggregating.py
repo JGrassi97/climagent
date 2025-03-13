@@ -22,7 +22,7 @@ class AggregateDatasetTool(BaseTool):
     description: str = "Aggregate the dataset on one or more coordinates."
     args_schema: Type[AggregateDatasetInput] = AggregateDatasetInput
     dataset_state: DatasetState
-    json_memory: JsonState  
+    json_state: JsonState  
 
     XARRAY_FUNCTIONS : dict = {
         "mean": "mean",
@@ -37,9 +37,9 @@ class AggregateDatasetTool(BaseTool):
         "cumprod": "cumprod",
     }
 
-    def __init__(self, dataset_state: DatasetState, json_memory: JsonState, **kwargs):
+    def __init__(self, dataset_state: DatasetState, json_state: JsonState, **kwargs):
         kwargs["dataset_state"] = dataset_state 
-        kwargs["json_memory"] = json_memory
+        kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
     def _run(self, func: str, dims: List[str]) -> str:
@@ -54,7 +54,7 @@ class AggregateDatasetTool(BaseTool):
             operation = f"Aggregated on {dims} using {func}"
 
             self.dataset_state.update_dataset(reduced_dat, operation)
-            self.json_memory.update_json_spec(reduced_dat, operation)
+            self.json_state.update_json_spec(reduced_dat, operation)
 
             return f"Aggregation executed successfully: {operation}"
 

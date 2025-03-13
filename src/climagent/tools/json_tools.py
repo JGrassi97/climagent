@@ -29,10 +29,10 @@ class JsonGetValueTool_custom(BaseTool):
     Before calling this you should be SURE that the path to this exists.
     The input is a text representation of the path to the dict in Python syntax (e.g. data["key1"][0]["key2"]).
     """
-    json_memory: JsonState 
+    json_state: JsonState 
 
-    def __init__(self, json_memory: JsonState, **kwargs):
-        kwargs["json_memory"] = json_memory
+    def __init__(self, json_state: JsonState, **kwargs):
+        kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
     def _run(
@@ -40,7 +40,7 @@ class JsonGetValueTool_custom(BaseTool):
         tool_input: str,
         #run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
-        return self.json_memory.get_spec().value(tool_input)
+        return self.json_state.get_spec().value(tool_input)
 
     async def _arun(
         self,
@@ -61,10 +61,10 @@ class JsonListKeysTool_custom(BaseTool):
     The input should be a text representation of the path in Python syntax 
     (e.g., data["key1"][0]["key2"]). Make sure the path exists before calling.
     """
-    json_memory: JsonState  # Use JsonState instead of a static JsonSpec
+    json_state: JsonState  # Use JsonState instead of a static JsonSpec
 
-    def __init__(self, json_memory: JsonState, **kwargs):
-        kwargs["json_memory"] = json_memory
+    def __init__(self, json_state: JsonState, **kwargs):
+        kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
     def _run(
@@ -74,7 +74,7 @@ class JsonListKeysTool_custom(BaseTool):
     ) -> str:
         """Returns the list of keys at the specified JSON path."""
         try:
-            json_spec = self.json_memory.get_spec()  # Get the latest json_spec
+            json_spec = self.json_state.get_spec()  # Get the latest json_spec
             return str(json_spec.keys(tool_input))  # Convert list to string
         except KeyError:
             return f"Error: Invalid path '{tool_input}', key not found."

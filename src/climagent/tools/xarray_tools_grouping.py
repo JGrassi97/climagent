@@ -19,11 +19,11 @@ class ResampleTimeTool(BaseTool):
     description: str = "Resample a dataset on a time coordinate"
     args_schema: Type[ResampleTimeDatasetInput] = ResampleTimeDatasetInput
     dataset_state: DatasetState
-    json_memory: JsonState  
+    json_state: JsonState  
 
-    def __init__(self, dataset_state: DatasetState, json_memory: JsonState, **kwargs):
+    def __init__(self, dataset_state: DatasetState, json_state: JsonState, **kwargs):
         kwargs["dataset_state"] = dataset_state 
-        kwargs["json_memory"] = json_memory
+        kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
     def _run(self, coordinate_name: str, frequency: str) -> str:
@@ -36,7 +36,7 @@ class ResampleTimeTool(BaseTool):
             operation = f"Group on {coordinate_name}({frequency})"
 
             self.dataset_state.update_dataset(subset_dat, operation)
-            self.json_memory.update_json_spec(subset_dat, operation)
+            self.json_state.update_json_spec(subset_dat, operation)
             return f"Subset executed successfully: {operation}"
 
         except Exception as e:
