@@ -1,0 +1,14 @@
+[
+    {
+        "query": "I would like you to perform the following operations on the input dataset:\n1. Select the coordinates of Rome in the dataset.\n2. Select the optimistic scenario.",
+        "coordinates": {"lat": "41.9028", "lon": "12.4964", "scenario": "ssp1_2_6"}
+    },
+    {
+        "query": "Extract data for Paris in the pessimistic scenario.",
+        "coordinates": {"lat": "48.8566", "lon": "2.3522", "scenario": "ssp5_8_5"}
+    },
+    {
+        "query": "Retrieve climate data for New York under a moderate emissions scenario.",
+        "coordinates": {"lat": "40.7128", "lon": "-74.0060", "scenario": "ssp2_4_5"}
+    }
+]
