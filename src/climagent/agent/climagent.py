@@ -24,21 +24,21 @@ from climagent.state.agent_state import State
 
 
 class ClimAgent:
-    def __init__(self, dataset_path: str, llm, llm_temperature: float = 0.0):
+    def __init__(self, dataset: xr.Dataset, llm, llm_temperature: float = 0.0):
         
     
         # Load dataset
-        self.dataset = xr.open_mfdataset(dataset_path)
+        self.dataset = dataset
         self.dataset_state = DatasetState(self.dataset)
-        self.json_memory = JsonState(self.dataset)
+        self.json_state = JsonState(self.dataset)
         
         # Initialize tools
         self.tools = [
-            JsonGetValueTool_custom(json_memory=self.json_memory),
-            JsonListKeysTool_custom(json_memory=self.json_memory),
-            SubsetDatasetTool(dataset_state=self.dataset_state, json_memory=self.json_memory),
-            ResampleTimeTool(dataset_state=self.dataset_state, json_memory=self.json_memory),
-            AggregateDatasetTool(dataset_state=self.dataset_state, json_memory=self.json_memory)
+            JsonGetValueTool_custom(json_state=self.json_state),
+            JsonListKeysTool_custom(json_state=self.json_state),
+            SubsetDatasetTool(dataset_state=self.dataset_state, json_state=self.json_state),
+            ResampleTimeTool(dataset_state=self.dataset_state, json_state=self.json_state),
+            AggregateDatasetTool(dataset_state=self.dataset_state, json_state=self.json_state)
         ]
         self.tools_names = {t.name: t for t in self.tools}
         
@@ -86,4 +86,4 @@ class ClimAgent:
         return graph_builder.compile()
     
     def run(self, messages: list[AnyMessage]):
-        return self.graph.invoke({'messages': [PREFIX] + messages + [make_suffix(self.json_memory)]},  config={"recursion_limit": 50}), self.dataset_state.dataset
+        return self.graph.invoke({'messages': [PREFIX] + messages + [make_suffix(self.json_state)]},  config={"recursion_limit": 50}), self.dataset_state.dataset
