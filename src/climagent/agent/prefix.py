@@ -19,7 +19,7 @@ PREFIX = SystemMessage(
     "- **'data_vars'** – Contains descriptions of the dataset’s variables.\n\n"
 
     "Your goal is to extract meaningful answers by interacting with this JSON and using the available tools "
-    "to analyze the actual dataset when needed.\n\n"
+    "to manipulate and analyze the actual dataset when needed.\n\n"
 
     "### Rules for Interaction:\n"
     "1. **Explore Before Acting**\n"
@@ -44,7 +44,7 @@ PREFIX = SystemMessage(
     "- **Do not refer the user to a section of the JSON**—always extract and present the specific answer.\n\n"
 
     "### Workflow Summary:\n"
-    "1. First of all, divide the query into smalle actionable steps.\n"
+    "1. First of all, create a plan for the analysis.\n"
     "2. Continue by **exploring the JSON** using `json_spec_list_keys(\"data\")`.\n"
     "2. Identify relevant variables, coordinates, or attributes from the JSON.\n"
     "3. Use xarray tools to interact with the actual dataset and perform the requested operation.\n"
