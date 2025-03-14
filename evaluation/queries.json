@@ -1,14 +1,60 @@
 [
     {
-        "query": "I would like you to perform the following operations on the input dataset:\n1. Select the coordinates of Rome in the dataset.\n2. Select the optimistic scenario.",
-        "coordinates": {"lat": "41.9028", "lon": "12.4964", "scenario": "ssp1_2_6"}
+      "query": "Select the coordinates of Rome and the optimistic scenario.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"41.9028\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"12.4964\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp1_2_6\"]}" }
+      ]
     },
     {
-        "query": "Extract data for Paris in the pessimistic scenario.",
-        "coordinates": {"lat": "48.8566", "lon": "2.3522", "scenario": "ssp5_8_5"}
+      "query": "Resample time-series data for Paris to 10-year intervals, then extract the pessimistic scenario.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"48.8566\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"2.3522\"]}" },
+        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"10Y\"}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}" }
+      ]
     },
     {
-        "query": "Retrieve climate data for New York under a moderate emissions scenario.",
-        "coordinates": {"lat": "40.7128", "lon": "-74.0060", "scenario": "ssp2_4_5"}
+      "query": "Select data for New York and apply a 5-year resampling.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"40.7128\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-74.0060\"]}" },
+        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"5Y\"}" }
+      ]
+    },
+    {
+      "query": "Extract climate data for Berlin and apply a 20-year resampling.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"52.5200\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"13.4050\"]}" },
+        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"20Y\"}" }
+      ]
+    },
+    {
+      "query": "Retrieve climate projections for Tokyo under the moderate emissions scenario.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"35.6895\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"139.6917\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp2_4_5\"]}" }
+      ]
+    },
+    {
+      "query": "Analyze climate trends in Sydney by selecting the location and resampling every 15 years.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"-33.8688\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"151.2093\"]}" },
+        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"15Y\"}" }
+      ]
+    },
+    {
+      "query": "Extract climate data for London in the worst-case scenario and apply a 30-year time resampling.",
+      "functions": [
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"51.5074\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-0.1278\"]}" },
+        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}" },
+        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"30Y\"}" }
+      ]
     }
-]
+  ]
