@@ -10,6 +10,10 @@ import os
 import json
 import pandas as pd
 
+from dotenv import load_dotenv
+load_dotenv("../credentials.env")
+
+
 def initialize_llm():
     return AzureChatOpenAI(
         deployment_name=os.getenv("GPT_DEPLOYMENT_NAME"),
