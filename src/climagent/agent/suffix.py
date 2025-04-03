@@ -12,6 +12,7 @@ def make_suffix(json_memory):
         f"coords: {json_memory.get_spec().dict_['coords'].keys()}\n"
         f"data_vars: {json_memory.get_spec().dict_['data_vars'].keys()}\n"
         "Please, call the json_function only if you think you need more information."
+        "Plase, keep in mind the operations you have performed, in order to avoid redoing them."
         )
     )
     return suffix
