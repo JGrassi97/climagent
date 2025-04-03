@@ -1,26 +1,21 @@
-import os
+
 import json
 import xarray as xr
-import pandas as pd
-from dotenv import load_dotenv
+
 from tqdm import tqdm
 from langchain_core.messages import HumanMessage
 from climagent.agent.climagent import ClimAgent
 
-
 from utils import initialize_llm, load_queries, save_statistics_to_excel, deterministic_process_dataset
-from metrics import success_rate, repetition_rate
-
+from metrics import success_rate, repetition_rate, optimal_flow
 import argparse
 
 # suppress warnings
 import warnings
 warnings.filterwarnings("ignore")
 
-# Carica variabili d'ambiente
-load_dotenv("../credentials.env")
 
-# Carica variabili d'ambiente
+
 
 def main():
 
@@ -57,19 +52,22 @@ def main():
                 
                 sr = success_rate(dataset_state_ref, mod_dataset)
                 rr = repetition_rate(response)
+                of = optimal_flow(functions)
 
             except Exception:
+                #raise
                 sr = 'Run failed'
                 rr = 'Run failed'
+                of = 'Run failed'
 
             run_results[idx_run] = {"success_rate": sr,
-                                    "repetition_rate": rr}
+                                    "repetition_rate": rr,
+                                    "optimal_flow": of}
         
         query_results[query] = run_results
     
 
     with open("query_results.json", "w") as f:
-        # Save the results to a json file in indent format
         json.dump(query_results, f, indent=4)
 
 if __name__ == "__main__":
