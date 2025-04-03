@@ -170,10 +170,13 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-
 # Prototype
 notebooks/
-example/
+example_datasets/
+src/scripts/climatology_archive.py
 
 # AI Credentials
 credentials.env
+
+# vscode
+.vscode/
