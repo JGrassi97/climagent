@@ -57,7 +57,7 @@ class ClimAgent:
     def _build_agent(self, state):
         
         def planner(state):
-            messages = state['messages']
+            #messages = state['messages']
 
 
             plan_prompt = (
@@ -76,14 +76,15 @@ class ClimAgent:
                 "- **Step 3**: Compute statistical metrics → Use `AggregateDatasetTool` to compute (...) on (...) cordinate.\n"
                 "- **Final Output**: A cleaned and structured dataset ready for visualization or further analysis.\n"
                 "\n"
-                "Now, based on the user's request, generate a custom plan.\n"
+                "Now, based on the user's request, generate a custom plan. Make sure that the plan is strictly related to the query and saty to it.\n"
+                "Only generate a plan if the query requires it, otherwise return the message 'No plan needed'.\n"
                 "DO NOT CALL ANY TOOLS. Just create a structured plan."
             )
             
             # Aggiungi il plan_prompt come SystemMessage
             plan_message = SystemMessage(content=plan_prompt)
 
-            messages = [plan_message] + state['messages']
+            messages = state['messages'] + [plan_message] + [make_suffix(self.json_state)]
             
             # Chiediamo all'LLM di generare il piano di analisi
             plan_message_response = self.llm_planner.invoke(messages)
@@ -92,7 +93,7 @@ class ClimAgent:
             if isinstance(plan_message_response, str):  
                 plan_message_response = AnyMessage(content=plan_message_response)  
 
-            return {'messages': messages + [plan_message_response] + [PREFIX] + [make_suffix(self.json_state)]}
+            return {'messages': [PREFIX] + [plan_message_response]}
         
         def run_llm(state):
             messages = state['messages']
@@ -139,3 +140,4 @@ class ClimAgent:
     
     def run(self, messages: list[AnyMessage]):
         return self.graph.invoke({'messages': messages},  config={"recursion_limit": 50})
+    
