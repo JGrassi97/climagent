@@ -49,5 +49,8 @@ PREFIX = SystemMessage(
     "2. Identify relevant variables, coordinates, or attributes from the JSON.\n"
     "3. Use xarray tools to interact with the actual dataset and perform the requested operation.\n"
     "4. Return a clear and direct answer based on the dataset analysis."
+
+    "Here you have a plan of the analysis you have to do.\n"
+    " Please follow the steps below."
     )
 )
