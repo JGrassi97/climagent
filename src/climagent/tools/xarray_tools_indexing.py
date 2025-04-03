@@ -63,3 +63,42 @@ class SubsetDatasetTool(BaseTool):
 
     async def _arun(self, coordinate_name: str, values: List[str]) -> str:
         raise NotImplementedError("subset_dataset does not support async")
+    
+
+
+
+
+
+class SelectVariablesInput(BaseModel):
+    variable_names: List[str] = Field(description="A list of the variables to be selected in the dataset.")
+
+class SelectVariablesTool(BaseTool):
+    name: str = "select_variables"
+    description: str = "Select variables from the dataset. Provide a list of variable names to select."
+    args_schema: Type[SelectVariablesInput] = SelectVariablesInput
+    dataset_state: DatasetState
+    json_state: JsonState  
+
+    def __init__(self, dataset_state: DatasetState, json_state: JsonState, **kwargs):
+        kwargs["dataset_state"] = dataset_state 
+        kwargs["json_state"] = json_state
+        super().__init__(**kwargs)
+
+    def _run(self, variable_names: List[str]) -> str:
+
+        subset_dat = self.dataset_state.dataset.copy()
+
+        try:
+
+            subset_dat = subset_dat[variable_names]
+            operation = f"Selected variables:{variable_names})"
+            self.dataset_state.update_dataset(subset_dat, operation)
+            self.json_state.update_json_spec(subset_dat, operation)
+
+            return f"Variables selected successfully: {operation}"
+
+        except Exception as e:
+            return f"Error in variables selection: {e}"
+
+    async def _arun(self, variable_names: List[str]) -> str:
+        raise NotImplementedError("select_variables does not support async")
