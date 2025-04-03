@@ -44,7 +44,7 @@ PREFIX = SystemMessage(
     "- **Do not refer the user to a section of the JSON**—always extract and present the specific answer.\n\n"
 
     "### Workflow Summary:\n"
-    "1. First of all, create a plan for the analysis.\n"
+    "1. First of all, create a plan for the analysis. Keep strictly to the user query, you only have to respond to his request.\n"
     "2. Continue by **exploring the JSON** using `json_spec_list_keys(\"data\")`.\n"
     "2. Identify relevant variables, coordinates, or attributes from the JSON.\n"
     "3. Use xarray tools to interact with the actual dataset and perform the requested operation.\n"
