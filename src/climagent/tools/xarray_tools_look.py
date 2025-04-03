@@ -29,9 +29,13 @@ class LookDatasetTool(BaseTool):
     def _run(self) -> str:
 
         dat = self.dataset_state.dataset.copy()
+        content = dat.to_dict()
+
+        if len(content) > 10000:
+            content = content[:10000] + "... [truncated]"
 
         try:
-            return f"Dataset content: {dat.to_dict()}"
+            return f"Dataset content: {content}"
 
         except Exception as e:
             return f"Cannot look at the dataset: {e}"
