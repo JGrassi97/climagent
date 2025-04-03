@@ -34,3 +34,20 @@ def repetition_rate(response):
     return results
 
 
+def optimal_flow(functions):
+
+    all_tools = []
+    results = {}
+    for id, func in enumerate(functions):
+        
+        if func['name'] is not None:
+            all_tools.append(func['name'])
+
+        all_tools_unique = np.unique(all_tools)
+        for tool in all_tools_unique:
+
+            results[f'{tool}_optimal'] = all_tools.count(tool)
+
+    return results
+
+
