@@ -1,60 +1,94 @@
 [
     {
-      "query": "Select the coordinates of Rome and the optimistic scenario.",
+      "query": "Select the coordinates of Paris.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"41.9028\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"12.4964\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp1_2_6\"]}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"48.8566\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"2.3522\"]}"}
       ]
     },
     {
-      "query": "Resample time-series data for Paris to 10-year intervals, then extract the pessimistic scenario.",
+      "query": "Select the coordinates of Amsterdam and the high emission scenario.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"48.8566\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"2.3522\"]}" },
-        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"10Y\"}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"52.3676\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"4.9041\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}"}
       ]
     },
     {
-      "query": "Select data for New York and apply a 5-year resampling.",
+      "query": "Resample time-series data for Lisbon to 15-year intervals.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"40.7128\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-74.0060\"]}" },
-        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"5Y\"}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"38.7169\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-9.1399\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"15Y\"}"}
       ]
     },
     {
-      "query": "Extract climate data for Berlin and apply a 20-year resampling.",
+      "query": "Select the coordinates of Stockholm and extract the low emission scenario.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"52.5200\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"13.4050\"]}" },
-        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"20Y\"}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"59.3293\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"18.0686\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp1_2_6\"]}"}
       ]
     },
     {
-      "query": "Retrieve climate projections for Tokyo under the moderate emissions scenario.",
+      "query": "Resample time-series data for Vienna to 7-year intervals, then aggregate along the time dimension using the max.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"35.6895\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"139.6917\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp2_4_5\"]}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"48.2082\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"16.3738\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"7Y\"}"},
+        {"name": "aggregate_dataset", "arguments": "{\"func\":\"max\",\"dims\":[\"time\"]}"}
       ]
     },
     {
-      "query": "Analyze climate trends in Sydney by selecting the location and resampling every 15 years.",
+      "query": "Select the coordinates of Dublin, resample time-series data to 8-year intervals, then extract the moderate scenario and aggregate along the time dimension using the standard deviation.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"-33.8688\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"151.2093\"]}" },
-        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"15Y\"}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"53.3498\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-6.2603\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"8Y\"}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp2_4_5\"]}"},
+        {"name": "aggregate_dataset", "arguments": "{\"func\":\"std\",\"dims\":[\"time\"]}"}
       ]
     },
     {
-      "query": "Extract climate data for London in the worst-case scenario and apply a 30-year time resampling.",
+      "query": "Resample time-series data for Prague to 12-year intervals, extract the low emission scenario, aggregate along the time dimension using the min.",
       "functions": [
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"51.5074\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"-0.1278\"]}" },
-        { "name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}" },
-        { "name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"30Y\"}" }
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"50.0755\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"14.4378\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"12Y\"}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp1_2_6\"]}"},
+        {"name": "aggregate_dataset", "arguments": "{\"func\":\"min\",\"dims\":[\"time\"]}"}
       ]
-    }
+    },
+    {
+      "query": "Resample time-series data for Bucharest to 6-year intervals, select the extreme scenario, aggregate along the time dimension using the max.",
+      "functions": [
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"44.4268\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"26.1025\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"6Y\"}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}"},
+        {"name": "aggregate_dataset", "arguments": "{\"func\":\"max\",\"dims\":[\"time\"]}"}
+      ]
+    },
+    {
+      "query": "Select the coordinates of Copenhagen, resample time-series data to 9-year intervals, extract the moderate scenario, aggregate along the time dimension using the mean.",
+      "functions": [
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"55.6761\"]}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"12.5683\"]}"},
+        {"name": "resampletime_dataset", "arguments": "{\"coordinate_name\":\"time\",\"frequency\":\"9Y\"}"},
+        {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp2_4_5\"]}"},
+        {"name": "aggregate_dataset", "arguments": "{\"func\":\"mean\",\"dims\":[\"time\"]}"}
+      ]
+    },
+    {
+        "query": "Select a range of latitudes (40.0 to 50.0), a range of longitudes (10.0 to 20.0), and a range of years (1990 to 2050), then extract the extreme scenario, aggregate along the latitude dimension using the max, aggregate along the longitude dimension using the max, and finally aggregate along the time dimension using the mean.",
+        "functions": [
+          {"name": "subset", "arguments": "{\"coordinate_name\":\"lat\",\"values\":[\"40.0\",\"50.0\"]}"},
+          {"name": "subset", "arguments": "{\"coordinate_name\":\"lon\",\"values\":[\"10.0\",\"20.0\"]}"},
+          {"name": "subset", "arguments": "{\"coordinate_name\":\"time\",\"values\":[\"1990\",\"2050\"]}"},
+          {"name": "subset", "arguments": "{\"coordinate_name\":\"scenario\",\"values\":[\"ssp5_8_5\"]}"},
+          {"name": "aggregate_dataset", "arguments": "{\"func\":\"max\",\"dims\":[\"lat\"]}"},
+          {"name": "aggregate_dataset", "arguments": "{\"func\":\"max\",\"dims\":[\"lon\"]}"},
+          {"name": "aggregate_dataset", "arguments": "{\"func\":\"mean\",\"dims\":[\"time\"]}"}
+        ]
+      }
   ]
