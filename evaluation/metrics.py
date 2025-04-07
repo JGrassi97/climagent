@@ -7,8 +7,6 @@ from utils import deterministic_process_dataset
 
 def success_rate(dataset_ref, dataset_agent):
 
-    correct, failed = 0, 0
-    
     if dataset_ref.dataset.equals(dataset_agent):
         return 'correct'
     else:
