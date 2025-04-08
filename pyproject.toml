@@ -4,13 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "climagent"
-version = "0.1"
-description = "A brief description of your project"  # Add a brief description
-readme = "README.md"  # Link to your README file
+dynamic = ["version"]
+description = "AI Autonous Agent for climate data analysis"
+readme = "README.md"
 authors = [
     { name = "Jacopo Grassi", email = "jacopo.grassi@polito.it" }
 ]
 
-
-[project.scripts]
-climagent_archive = "scripts.climatology_archive:main"  
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}
