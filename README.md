@@ -1,1 +1,1 @@
-# climagent
+<img src="https://github.com/JGrassi97/climagent/blob/main/img/logo_chatgpt.png" width="220" height="120">
