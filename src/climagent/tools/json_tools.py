@@ -29,9 +29,10 @@ class JsonGetValueTool_custom(BaseTool):
     Before calling this you should be SURE that the path to this exists.
     The input is a text representation of the path to the dict in Python syntax (e.g. data["key1"][0]["key2"]).
     """
-    json_state: JsonState 
+    # json_state: JsonState 
 
     def __init__(self, json_state: JsonState, **kwargs):
+        self.json_state = json_state  # Store the JsonState instance
         kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 
@@ -61,9 +62,10 @@ class JsonListKeysTool_custom(BaseTool):
     The input should be a text representation of the path in Python syntax 
     (e.g., data["key1"][0]["key2"]). Make sure the path exists before calling.
     """
-    json_state: JsonState  # Use JsonState instead of a static JsonSpec
+    #json_state: JsonState  # Use JsonState instead of a static JsonSpec
 
     def __init__(self, json_state: JsonState, **kwargs):
+        self.json_state = json_state  # Store the JsonState instance
         kwargs["json_state"] = json_state
         super().__init__(**kwargs)
 

@@ -27,7 +27,6 @@ from climagent.state.agent_state import State
 class ClimAgent:
     def __init__(self, dataset: xr.Dataset, llm, state = State, llm_temperature: float = 0.0):
         
-        
         # Load dataset
         self.dataset = dataset
         self.dataset_state = DatasetState(self.dataset)
