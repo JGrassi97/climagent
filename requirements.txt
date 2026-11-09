@@ -1,0 +1,17 @@
+xarray
+zarr
+netCDF4
+numpy
+pandas
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langgraph
+pydantic
+python-dotenv
+earthkit-data
+lida
+matplotlib
+tqdm
+openpyxl

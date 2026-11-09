@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "climagent"
 dynamic = ["version"]
-description = "AI Autonous Agent for climate data analysis"
+description = "AI Autonomous Agent for climate data analysis"
 readme = "README.md"
 authors = [
     { name = "Jacopo Grassi", email = "jacopo.grassi@polito.it" }
